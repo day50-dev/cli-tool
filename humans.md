@@ -8,6 +8,10 @@
 
 The **agent-cli-helper** tool you are free to run yourself but you'll probably find it verbose, clunky and hostile because designing for LLM ingestion is not the same as human UX flow.
 
+The namespace and tmux orchestration is intentionally invisible and silent to the agent in order to minimize distraction. 
+
+Feel free to file bugs if you can't get it to play nice.
+
 `acli-manage` is a tool to view and manage all *agent-cli-helper* sessions across different agent instances by going into the tmux details.
 
 ## When to Use acli-manage
