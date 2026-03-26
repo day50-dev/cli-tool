@@ -1,3 +1,0 @@
-[console_scripts]
-cli-tool = cli_tool.main:main
-cli-tool-manage = cli_tool.manage:main
