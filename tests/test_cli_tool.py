@@ -40,6 +40,24 @@ class TestGenerateSessionId:
         assert "session" in session_id.lower()
 
 
+class TestCLIArgs:
+    """Tests for CLI argument parsing."""
+
+    def test_no_arguments_exits_with_error(self):
+        """Running the CLI without arguments should print help and return exit code 1."""
+        from cli_tool.main import main
+        # We need to mock sys.argv because main() calls parser.parse_args() which reads it.
+        import sys
+        old_argv = sys.argv
+        sys.argv = ["agent-cli-helper"]
+        try:
+            with pytest.raises(SystemExit) as excinfo:
+                main()
+            assert excinfo.value.code == 1
+        finally:
+            sys.argv = old_argv
+
+
 class TestParseKeystrokes:
     """Tests for parse_keystrokes function."""
 

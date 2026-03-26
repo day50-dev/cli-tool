@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-agent-cli-helper: A tool for LLMs and agents to interface interactive applications from the CLI.
+Examples:
+    agent-cli-helper run-command <cmd>            # Run a program in a session
+    agent-cli-helper send-keystrokes <id> <keys>    # Send keystrokes to a session
+    agent-cli-helper process-info <id>              # Get process info for a session
+    agent-cli-helper kill-all-tools                 # Kill all sessions
 """
 
 import argparse
@@ -726,7 +730,8 @@ def main():
     """Main entry point for agent-cli-helper."""
     parser = argparse.ArgumentParser(
         description='A tool for LLMs and agents to interface interactive applications from the CLI.',
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
     )
     
     # Subcommands
@@ -816,6 +821,11 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    # If no command is provided, print help and exit with 1
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
     
     # Dispatch to appropriate command handler
     if args.command == 'run-command':

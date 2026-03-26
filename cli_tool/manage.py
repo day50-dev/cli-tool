@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 """
-acli-manage: Manage agent-cli-helper sessions
-
-A human-facing tool to view and manage all agent-cli-helper sessions across
-different namespaces (harnesses). Shows liveness of parent processes,
-session tree, and supports glob patterns for operations.
-
-Examples:
-    acli-manage                       # Show tree of all sessions
-    acli-manage kill "<pattern>"      # Kill sessions matching pattern
+Manage agent-cli-helper sessions across different namespaces.
 """
 
 import argparse
@@ -17,6 +9,7 @@ import os
 import subprocess
 import sys
 import time
+from importlib.metadata import version
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -263,10 +256,10 @@ def kill_matching_sessions(pattern: str, verbose: bool = False) -> int:
 def main():
     """Main entry point for acli-manage."""
     parser = argparse.ArgumentParser(
-        description='acli-manage: Manage agent-cli-helper sessions',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        description='View and manage agent-cli-helper sessions.',
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    parser.add_argument('--version', action='version', version=f'%(prog)s {version("agent-cli-helper")}')
     
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
