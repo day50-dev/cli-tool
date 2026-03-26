@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
-cli-tool: A tool for LLMs and agents to interface interactive applications from the CLI.
-
-Usage:
-    cli-tool run-command <cmd>            # Run a program in a session
-    cli-tool send-keystrokes <id> <keys>    # Send keystrokes to a session
-    cli-tool process-info <id>              # Get process info for a session
-    cli-tool kill-all-tools                 # Kill all sessions
-    cli-tool --global                       # View all sessions globally
+agent-cli-helper: A tool for LLMs and agents to interface interactive applications from the CLI.
 """
 
 import argparse
@@ -733,8 +726,7 @@ def main():
     """Main entry point for agent-cli-helper."""
     parser = argparse.ArgumentParser(
         description='A tool for LLMs and agents to interface interactive applications from the CLI.',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
     # Subcommands
@@ -824,10 +816,6 @@ def main():
     )
     
     args = parser.parse_args()
-    
-    # Handle --global flag (list sessions)
-    if args.global_list:
-        return list_sessions()
     
     # Dispatch to appropriate command handler
     if args.command == 'run-command':
