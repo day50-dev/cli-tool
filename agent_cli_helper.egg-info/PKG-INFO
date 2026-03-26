@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: agent-cli-helper
-Version: 0.2.0
+Version: 0.2.1
 Summary: A tmux wrapper for LLMs to interact with full-screen CLI applications
 Author: DAY50
 License: MIT License
