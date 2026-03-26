@@ -24,18 +24,31 @@ agent-cli-helper run-command "python -m ipdb script.py"
 Returns XML with session ID and screen capture.
 
 ### send-keystrokes
-Send keystrokes to a running session:
+Send keystrokes to a running session (Enter is automatically appended):
 ```
-agent-cli-helper send-keystrokes vim-tmp-file "iHello World\nEscape"
+agent-cli-helper send-keystrokes vim-tmp-file "Hello World"
 agent-cli-helper send-keystrokes ssh-user-host "^C"
 ```
 
-Keystroke syntax:
+**Important:** Enter is automatically appended to all keystrokes sent with this command.
+
+### send-raw-keystrokes
+Send keystrokes to a running session WITHOUT Enter appended:
+```
+agent-cli-helper send-raw-keystrokes vim-tmp-file "i"
+agent-cli-helper send-raw-keystrokes vim-tmp-file "Hello World"
+```
+
+Use this when you need to send multiple commands without pressing Enter after each one.
+
+Keystroke syntax (works for both commands):
 - `^X` or `C-X` = Ctrl+X
-- `\n` = Enter
+- `\n` = Enter (if you need to embed Enter in the middle of keystrokes)
 - `\t` = Tab
 - `Up`, `Down`, `Left`, `Right` = Arrow keys
 - `BSpace` = Backspace
+
+**Warning:** If you send the literal word "Enter" (not `\n`), a warning will be shown because this doesn't work as intended. Use send-raw-keystrokes if you actually need to send the word.
 
 ### get-screen-capture
 Get current screen content without sending keystrokes:
@@ -49,8 +62,14 @@ Get session details (PID, uptime):
 agent-cli-helper process-info vim-tmp-file
 ```
 
+### finish-command
+Finish a session and clean up (IMPORTANT - use this when done):
+```
+agent-cli-helper finish-command vim-tmp-file
+```
+
 ### kill-session
-Terminate a specific session:
+Terminate a specific session (use finish-command instead for cleanup):
 ```
 agent-cli-helper kill-session vim-tmp-file
 ```
