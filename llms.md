@@ -1,7 +1,5 @@
 # agent-cli-helper - LLMs and Agents Documentation
 
-> **IMPORTANT**: This file is for LLMs and agents only. See `humans.md` for human-facing documentation.
-
 agent-cli-helper is a wrapper around tmux that gives LLMs an easier way to interact with full-screen terminal applications.
 
 ## When to Use agent-cli-helper
