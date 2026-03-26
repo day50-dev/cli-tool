@@ -33,6 +33,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Namespace prefix for our sockets (cli-tool)
+SOCKET_PREFIX = 'cltl'
+
 # Common shells to skip when walking PPID chain
 SHELLS = {'bash', 'zsh', 'sh', 'dash', 'fish', 'tcsh', 'csh', 'ksh', 'ash', 'busybox'}
 
@@ -41,9 +44,10 @@ def get_socket_name() -> str:
     Get the tmux socket name for this process.
     
     Walks up the PPID chain, skips shell processes, and returns the
-    harness PID (first non-shell parent) formatted as "PID-procname".
+    harness PID (first non-shell parent) formatted as "cltl-PID-procname".
     This ensures all processes forked from the same harness share the
     same socket, while different harness instances get different sockets.
+    The "cltl-" prefix ensures we don't clash with other tmux sockets.
     """
     current_pid = os.getpid()
     depth = 0
@@ -72,11 +76,11 @@ def get_socket_name() -> str:
             depth += 1
             continue
         
-        # Found the harness (non-shell parent)
-        return f"{ppid}_{proc_name}"
+        # Found the harness (non-shell parent) - add our prefix
+        return f"{SOCKET_PREFIX}-{ppid}_{proc_name}"
     
-    # Fallback to current PID if nothing found
-    return str(os.getpid())
+    # Fallback to current PID if nothing found - add our prefix
+    return f"{SOCKET_PREFIX}-{os.getpid()}"
 
 
 def run_tmux_cmd(args: List[str], capture: bool = True) -> Tuple[int, str, str]:
@@ -283,7 +287,7 @@ def new_command(command: str, force_new: bool = False) -> int:
     ])
     
     # Give the command time to start
-    time.sleep(0.5)
+    time.sleep(1)
     
     # Capture the screen
     screen_capture = capture_pane(session_id)
@@ -294,7 +298,7 @@ def new_command(command: str, force_new: bool = False) -> int:
     # Build XML output
     print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
 <screen-capture>
-{escape_xml(screen_capture)}
+{screen_capture}
 </screen-capture>
 </session>
 <instructions>
@@ -336,7 +340,7 @@ def get_screen_capture(session_id: str) -> int:
     
     print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
 <screen-capture>
-{escape_xml(screen_capture)}
+{screen_capture}
 </screen-capture>
 <random-usage-tip>{get_next_tip()}</random-usage-tip>
 </session>''')
@@ -418,11 +422,11 @@ The running program is "{escape_xml(current_program)}", not "{escape_xml(expecte
 
 You need to go from "{escape_xml(current_program)}" to "{escape_xml(expected_command)}".
 
-For example, if you're in a shell, you may need to type the command to start {expected_command}.
-If you're in another program, you may need to exit it first (e.g., type "exit", "^C", or ":q").
+For example, if you're in a shell, you may need to send the command to start {expected_command}.
+If you're in another program, you may need to exit it first (e.g., run `send-keystrokes session-id "exit\n"`, `send-keystrokes session-id "^C"`, or `send-keystrokes session-id ":q"`).
 </error>
 <screen-capture>
-{escape_xml(screen_capture)}
+{screen_capture}
 </screen-capture>
 </session>''')
         return 1
@@ -446,7 +450,7 @@ If you're in another program, you may need to exit it first (e.g., type "exit", 
     print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
 <keystrokes sent="{escape_xml(keystrokes)}" />
 <screen-capture>
-{escape_xml(screen_capture)}
+{screen_capture}
 </screen-capture>
 <instructions>
 The keystrokes were sent. To send more keystrokes run `cli-tool send-keystrokes` again.
@@ -802,8 +806,7 @@ def main():
         'keystrokes',
         help='Keystrokes to send. Use ^X or C-X for Ctrl+X, S-X for Shift+X, M-X for Alt (meta)+X, ' +
              '\\n for Enter, \\t for Tab. Special keys: Up, Down, Left, Right, BSpace, BTab, DC (Delete), ' +
-             'End, Enter, Escape, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, Home, IC (Insert), ' +
-             'NPage or PageDown or PgDn, PPage or PageUp or PgUp, Space, Tab'
+             'End, Escape, F1-F12, Home, IC, NPage/PgDn, PPage/PgUp, Space, Tab'
     )
     
     # process-info
