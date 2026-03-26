@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 SOCKET_PREFIX = 'cltl'
 
 # Common shells to skip when walking PPID chain
-SHELLS = {'bash', 'zsh', 'sh', 'dash', 'fish', 'tcsh', 'csh', 'ksh', 'ash', 'busybox'}
+SHELLS = {'bash', 'zsh', 'sh', 'dash', 'fish', 'tcsh', 'csh', 'ksh', 'ash', 'busybox', 'uv'}
 
 def get_socket_name() -> str:
     """
