@@ -1,10 +1,10 @@
 ---
-name: agent-cli-tool-skill
+name: agent-cli-helper-skill
 description: Run interactive CLI programs in isolated tmux sessions, send keystrokes, capture screen output. Use for vim, nano, ssh, emacs, ipdb, and any terminal-based interactive applications. Keywords: terminal, interactive, tmux, shell, vim, ssh, emacs, debugger.
 compatibility: Requires tmux installed on system
 ---
 
-# agent-cli-tool Skill
+# agent-cli-helper Skill
 
 Use this skill when you need to interact with full-screen terminal applications like:
 - Text editors: vim, nano, emacs
@@ -16,12 +16,12 @@ Use this skill when you need to interact with full-screen terminal applications 
 
 | Command | Purpose |
 |---------|---------|
-| `agent-cli-tool run-command "<cmd>"` | Start a program in a session |
-| `agent-cli-tool send-keystrokes <session-id> "<keys>"` | Send keystrokes to session |
-| `agent-cli-tool get-screen-capture <session-id>` | Get current screen |
-| `agent-cli-tool process-info <session-id>` | Get PID, uptime |
-| `agent-cli-tool kill-session <session-id>` | Kill a session |
-| `agent-cli-tool list-sessions` | List all sessions |
+| `agent-cli-helper run-command "<cmd>"` | Start a program in a session |
+| `agent-cli-helper send-keystrokes <session-id> "<keys>"` | Send keystrokes to session |
+| `agent-cli-helper get-screen-capture <session-id>` | Get current screen |
+| `agent-cli-helper process-info <session-id>` | Get PID, uptime |
+| `agent-cli-helper kill-session <session-id>` | Kill a session |
+| `agent-cli-helper list-sessions` | List all sessions |
 
 ## Session ID Format
 
@@ -45,7 +45,7 @@ Each agent instance gets its own tmux socket namespace (via `-L` flag). Sessions
 
 ## Error Handling
 
-If a session already exists with the same name, you'll get a collision error. Use `agent-cli-tool force-run-command` to create a new session anyway.
+If a session already exists with the same name, you'll get a collision error. Use `agent-cli-helper force-run-command` to create a new session anyway.
 
 ## Important Notes
 

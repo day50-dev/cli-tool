@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Entry point for agent-cli-tool."""
+"""Entry point for agent-cli-helper."""
 import sys
 from cli_tool.main import main
 

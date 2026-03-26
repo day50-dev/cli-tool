@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-acli-manage: Manage agent-cli-tool sessions
+acli-manage: Manage agent-cli-helper sessions
 
-A human-facing tool to view and manage all agent-cli-tool sessions across
+A human-facing tool to view and manage all agent-cli-helper sessions across
 different namespaces (harnesses). Shows liveness of parent processes,
 session tree, and supports glob patterns for operations.
 
@@ -263,7 +263,7 @@ def kill_matching_sessions(pattern: str, verbose: bool = False) -> int:
 def main():
     """Main entry point for acli-manage."""
     parser = argparse.ArgumentParser(
-        description='acli-manage: Manage agent-cli-tool sessions',
+        description='acli-manage: Manage agent-cli-helper sessions',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )

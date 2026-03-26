@@ -5,7 +5,7 @@
 - **[llms.md](llms.md)** - Documentation for LLMs and agents
 - **[humans.md](humans.md)** - Documentation of human-only tools (IMPORTANT: agents should ignore this file)
 
-agent-cli-tool gives LLMs a way to use interactive terminal applications:
+agent-cli-helper gives LLMs a way to use interactive terminal applications:
 
 - **run-command** - Start a program in an interactive session
 - **send-keystrokes** - Control the program
@@ -17,16 +17,16 @@ agent-cli-tool gives LLMs a way to use interactive terminal applications:
 
 ```bash
 # Run a command in an interactive session
-agent-cli-tool run-command "vim file.txt"
+agent-cli-helper run-command "vim file.txt"
 
 # Send keystrokes to control the program
-agent-cli-tool send-keystrokes vim-file-txt "iHello\nEscape"
+agent-cli-helper send-keystrokes vim-file-txt "iHello\nEscape"
 
 # View current screen
-agent-cli-tool get-screen-capture vim-file-txt
+agent-cli-helper get-screen-capture vim-file-txt
 
 # List all sessions
-agent-cli-tool list-sessions
+agent-cli-helper list-sessions
 ```
 
 See [llms.md](llms.md) for detailed documentation.

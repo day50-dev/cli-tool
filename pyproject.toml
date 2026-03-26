@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-cli-tool"
-version = "0.2.2"
+name = "agent-cli-helper"
+version = "0.2.3"
 authors = [
   { name="DAY50" },
 ]
@@ -29,7 +29,7 @@ dependencies = []
 "Homepage" = "https://github.com/day50-dev/acli"
 
 [project.scripts]
-agent-cli-tool = "cli_tool.main:main"
+agent-cli-helper = "cli_tool.main:main"
 acli-manage = "cli_tool.manage:main"
 
 

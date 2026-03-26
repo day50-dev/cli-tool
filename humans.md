@@ -4,7 +4,7 @@
 
 # acli-manage - Human User Documentation
 
-acli-manage is a tool for humans to view and manage all agent-cli-tool sessions across different agent instances.
+acli-manage is a tool for humans to view and manage all agent-cli-helper sessions across different agent instances.
 
 ## When to Use acli-manage
 
@@ -65,7 +65,7 @@ Since agents create sessions but don't automatically clean them up, humans can u
 ## Socket Namespace Format
 
 Sockets use the format: `cltl-PID_procname`
-- `cltl` = agent-cli-tool prefix (to avoid clashing with other tmux sockets)
+- `cltl` = agent-cli-helper prefix (to avoid clashing with other tmux sockets)
 - `PID` = parent process ID (the harness that started the agent)
 - `procname` = the process name (codebuff, node, etc.)
 
