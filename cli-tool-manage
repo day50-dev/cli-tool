@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""Entry point for cli-tool-manage."""
+import sys
+from cli_tool.manage import main
+
+if __name__ == '__main__':
+    sys.exit(main())

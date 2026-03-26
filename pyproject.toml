@@ -30,6 +30,7 @@ dependencies = []
 
 [project.scripts]
 cli-tool = "cli_tool.main:main"
+cli-tool-manage = "cli_tool.manage:main"
 
 [tool.setuptools]
 packages = ["cli_tool"]
