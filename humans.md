@@ -2,11 +2,11 @@
 
 ---
 
-# cli-manage - Human User Documentation
+# cli-tool-manage - Human User Documentation
 
-cli-manage is a tool for humans to view and manage all cli-tool sessions across different agent instances.
+cli-tool-manage is a tool for humans to view and manage all cli-tool sessions across different agent instances.
 
-## When to Use cli-manage
+## When to Use cli-tool-manage
 
 - View all active sessions from all agent instances
 - Check which agent processes are still running (liveness)
@@ -20,7 +20,7 @@ cli-manage is a tool for humans to view and manage all cli-tool sessions across 
 Show tree of all sessions across all namespaces:
 
 ```
-$ cli-manage
+$ cli-tool-manage
 - cltl-366612-codebuff    (active)
   |- vim-some-file        2hr
   ╰- ssh-fanon-local     30m
@@ -36,7 +36,7 @@ $ cli-manage
 
 Show empty namespaces too:
 ```
-cli-manage list --all
+cli-tool-manage list --all
 ```
 
 ### Kill Sessions
@@ -45,18 +45,18 @@ Kill sessions matching a pattern:
 
 ```
 # Kill all sessions in a namespace
-cli-manage kill "cltl-366612-codebuff/*"
+cli-tool-manage kill "cltl-366612-codebuff/*"
 
 # Kill sessions matching pattern across all namespaces
-cli-manage kill "*-1"
+cli-tool-manage kill "*-1"
 
 # Kill specific session (in current namespace only)
-cli-manage kill "vim-some-file"
+cli-tool-manage kill "vim-some-file"
 ```
 
 ## Session Cleanup
 
-Since agents create sessions but don't automatically clean them up, humans can use `cli-manage` to:
+Since agents create sessions but don't automatically clean them up, humans can use `cli-tool-manage` to:
 
 1. **Identify dead namespaces** - processes that crashed or were killed
 2. **Clean up orphaned sessions** - sessions from dead agent processes
@@ -75,4 +75,4 @@ Example: `cltl-366612-codebuff` means agent with PID 366612 running codebuff.
 
 - Use `--all` flag to see even empty namespaces
 - Use `-v` flag with kill for verbose output
-- Kill dead namespaces first: `cli-manage kill "cltl-*-(dead)/*"` (patterns can match status too in future versions)
+- Kill dead namespaces first: `cli-tool-manage kill "cltl-*-(dead)/*"` (patterns can match status too in future versions)
