@@ -7,7 +7,7 @@
 - **[llms.md](llms.md)** - Documentation for LLMs and agents
 - **[humans.md](humans.md)** - Documentation of human-only tools (IMPORTANT: agents must ignore this file)
 
-agent-cli-helper gives LLMs a way to use interactive terminal applications.
+**agent-cli-helper** gives LLMs a way to use interactive terminal applications. Everything here is written for LLM ingestion and use. 
 
 ## For humans 
 Tell your harness (opencode, claude code, qwen, amp, gemini etc) to run `uvx agent-cli-helper` before asking it to do full-screen tui apps, interactive debugging, ssh'ing, emacs, vim, nano, and more.
