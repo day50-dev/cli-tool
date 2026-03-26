@@ -8,7 +8,7 @@
 
 https://github.com/user-attachments/assets/802fac7d-5815-4bb7-92fa-875d9e32320e
 
-**agent-cli-helper** gives LLMs a way to use interactive terminal applications. 
+**agent-cli-helper** gives LLMs a way to use interactive terminal applications successfully. Even on small models. 
 
 - **[llms.md](llms.md)** - Documentation for LLMs and agents
 - **[humans.md](humans.md)** - Documentation of human-only tools (IMPORTANT: agents must ignore this file)
