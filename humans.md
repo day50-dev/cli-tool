@@ -4,9 +4,9 @@
 
 # acli-manage - Human User Documentation
 
-acli is a tmux wrapper around the `-L` option which means it uses a separate socket. This means it has a very weak form of isolation which is limited to a particular instance of a harness.
+**acli**, expressed as **agent-cli-helper** is a tmux wrapper around the `-L` option which means it uses a separate socket. This means it has a very weak form of isolation which is limited to a particular instance of a harness.
 
-`acli-manage` is a view and manage all agent-cli-helper sessions across different agent instances by going into the tmux details.
+`acli-manage` is a tool to view and manage all *agent-cli-helper* sessions across different agent instances by going into the tmux details.
 
 Essentially the agent does the `malloc` and *could do the free* but in practice, it's too dumb so we can do it.
 
@@ -60,7 +60,7 @@ acli-manage kill "vim-some-file"
 
 ## Session Cleanup
 
-Since agents create sessions but don't automatically clean them up, humans can use `acli-manage` to:
+Agents should automatically clean sessions up but if they don't, humans can use `acli-manage` to:
 
 1. **Identify dead namespaces** - processes that crashed or were killed
 2. **Clean up orphaned sessions** - sessions from dead agent processes
@@ -74,9 +74,3 @@ Sockets use the format: `cltl-PID_procname`
 - `procname` = the process name (codebuff, node, etc.)
 
 Example: `cltl-366612-codebuff` means agent with PID 366612 running codebuff.
-
-## Tips
-
-- Use `--all` flag to see even empty namespaces
-- Use `-v` flag with kill for verbose output
-- Kill dead namespaces first: `acli-manage kill "cltl-*-(dead)/*"` (patterns can match status too in future versions)
