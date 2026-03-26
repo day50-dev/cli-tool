@@ -450,7 +450,7 @@ If you're in another program, you may need to exit it first (e.g., run `send-key
 {screen_capture}
 </screen-capture>
 <instructions>
-The keystrokes were sent. To send more keystrokes run `cli-tool send-keystrokes` again.
+The keystrokes were sent. Remember: If applicable, send "\n" to simulate an Enter.
 </instructions>
 <random-usage-tip>{get_next_tip()}</random-usage-tip>''')
     
@@ -744,7 +744,8 @@ def main():
     )
     new_cmd_parser.add_argument(
         'cmd',
-        help='The command to run (e.g., "nano some-file")'
+        nargs='+',
+        help='The command to run (e.g., "nano some-file" or python script.py)'
     )
     
     # force-run-command
@@ -754,7 +755,8 @@ def main():
     )
     force_cmd_parser.add_argument(
         'cmd',
-        help='The command to run (e.g., "nano some-file")'
+        nargs='+',
+        help='The command to run (e.g., "nano some-file" or python script.py)'
     )
     
     # get-screen-capture
@@ -829,9 +831,9 @@ def main():
     
     # Dispatch to appropriate command handler
     if args.command == 'run-command':
-        return new_command(args.cmd, force_new=False)
+        return new_command(' '.join(args.cmd), force_new=False)
     elif args.command == 'force-run-command':
-        return new_command(args.cmd, force_new=True)
+        return new_command(' '.join(args.cmd), force_new=True)
     elif args.command == 'get-screen-capture':
         return get_screen_capture(args.session_id)
     elif args.command == 'kill-session':
