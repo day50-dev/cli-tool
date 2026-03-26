@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/802fac7d-5815-4bb7-92fa-875d9e32320e
 **agent-cli-helper** gives LLMs a way to use interactive terminal applications successfully. Even on small models. 
 
 ## For humans 
-Tell your harness (opencode, claude code, qwen, amp, gemini etc) to run `uvx agent-cli-helper --help` before asking it to do full-screen tui apps, interactive debugging, ssh'ing, emacs, vim, nano, even claude code...
+Tell your harness (opencode, codex, qwen, amp, gemini etc) to run `uvx agent-cli-helper --help` before asking it to do full-screen tui apps, interactive debugging, ssh'ing, emacs, vim, nano, even claude code...
 
 That's it. No git clone, mcp, or configuration file needed.
 
