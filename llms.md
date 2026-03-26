@@ -56,12 +56,6 @@ Get current screen content without sending keystrokes:
 agent-cli-helper get-screen-capture vim-tmp-file
 ```
 
-### process-info
-Get session details (PID, uptime):
-```
-agent-cli-helper process-info vim-tmp-file
-```
-
 ### finish-command
 Finish a session and clean up (IMPORTANT - use this when done):
 ```
@@ -108,4 +102,3 @@ If a session already exists:
 
 - Always check `<screen-capture>` in output to see program state
 - Sessions persist until explicitly killed
-- Use `process-info` to check if a session is still alive

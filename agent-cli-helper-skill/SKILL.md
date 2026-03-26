@@ -1,6 +1,6 @@
 ---
 name: agent-cli-helper-skill
-description: Run interactive CLI programs in isolated tmux sessions, send keystrokes, capture screen output. Use for vim, nano, ssh, emacs, ipdb, and any terminal-based interactive applications. Keywords: terminal, interactive, tmux, shell, vim, ssh, emacs, debugger.
+description: Run interactive CLI programs in isolated sessions, send keystrokes, capture screen output. Use for vim, nano, ssh, emacs, ipdb, and any terminal-based interactive applications. Keywords: terminal, interactive, tmux, shell, vim, ssh, emacs, debugger.
 compatibility: Requires tmux installed on system
 ---
 
@@ -17,9 +17,10 @@ Use this skill when you need to interact with full-screen terminal applications 
 | Command | Purpose |
 |---------|---------|
 | `agent-cli-helper run-command "<cmd>"` | Start a program in a session |
-| `agent-cli-helper send-keystrokes <session-id> "<keys>"` | Send keystrokes to session |
+| `agent-cli-helper send-keystrokes <session-id> "<keys>"` | Send keystrokes to session with an Enter |
+| `agent-cli-helper send-raw-keystrokes <session-id> "<keys>"` | Send keystrokes to session without and enter |
+| `agent-cli-helper finish-command <session-id>  | Clean up a session |
 | `agent-cli-helper get-screen-capture <session-id>` | Get current screen |
-| `agent-cli-helper process-info <session-id>` | Get PID, uptime |
 | `agent-cli-helper kill-session <session-id>` | Kill a session |
 | `agent-cli-helper list-sessions` | List all sessions |
 
@@ -32,16 +33,12 @@ Session IDs are derived from the command. Examples:
 
 ## Keystroke Syntax
 
-- `^X` or `C-X` → Ctrl+X
+- `^X` → Ctrl+X
 - `\n` → Enter
 - `\t` → Tab
 - `Up`, `Down`, `Left`, `Right` → Arrow keys
 - `BSpace` → Backspace
 - `F1`-`F12` → Function keys
-
-## Session Isolation
-
-Each agent instance gets its own tmux socket namespace (via `-L` flag). Sessions are isolated between different agent instances.
 
 ## Error Handling
 
@@ -50,5 +47,4 @@ If a session already exists with the same name, you'll get a collision error. Us
 ## Important Notes
 
 - Always check the `<screen-capture>` in the output to see program state
-- Use `process-info` to check if a session is still alive
 - Sessions persist until explicitly killed - don't forget to clean up

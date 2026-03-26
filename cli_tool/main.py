@@ -3,7 +3,6 @@
 Examples:
     agent-cli-helper run-command <cmd>              Run a program in a session
     agent-cli-helper send-keystrokes <id> <keys>    Send keystrokes to a session
-    agent-cli-helper process-info <id>              Get process info for a session
 
 """
 
@@ -17,8 +16,6 @@ from datetime import datetime
 from typing import Optional, List, Tuple
 
 
-
-
 # Tip rotation state - tracks which tip was last shown (0-based index)
 _last_tip_index = -1
 
@@ -30,7 +27,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Namespace prefix for our sockets (cli-tool)
+# Namespace prefix for our sockets (agent-cli-helper)
 SOCKET_PREFIX = 'cltl'
 
 # Common shells to skip when walking PPID chain
@@ -48,7 +45,7 @@ def get_socket_name() -> str:
     """
     current_pid = os.getpid()
     depth = 0
-    max_depth = 4
+    max_depth = 5
     
     while depth < max_depth:
         try:
@@ -226,47 +223,17 @@ def get_current_program(session_id: str) -> str:
     return "unknown"
 
 
-def new_command(command: str, force_new: bool = False) -> int:
+def _run_command(command: str, session_id: str) -> int:
     """
-    Start a new command in a tmux session.
+    Internal function to actually run a command in a tmux session.
     
     Creates a new detached tmux session, sends the command to it,
     and returns XML output with session info and screen capture.
     
-    If force_new is True and a session with the same name exists,
-    adds a suffix (-1, -2, etc.) to create a new session.
+    This is the core function that does the actual tmux session creation.
+    Both run-command and force-run-command use this after handling their
+    respective collision logic.
     """
-    sanitized_name = sanitize_command_name(command)
-    
-    # Check for existing session
-    matching_session = find_matching_session(sanitized_name, "default")
-    
-    # Handle collision case (only if not force_new)
-    if matching_session and not force_new:
-        print(f'''<session id="{sanitized_name}">
-<error>You already have a session named {matching_session}. Did you mean to use that one? Here are your options:
-
-- If you intended to use it, run `cli-tool get-screen-capture {matching_session}`
-- If you want to interrupt it, run `cli-tool kill-session {matching_session}`
-- If you really do want a fresh session, run `cli-tool force-run-command "{command}"`
-</error>
-</session>''')
-        return 1
-    
-    # If force_new and session exists, add a suffix to create a new session
-    if matching_session and force_new:
-        base_name = sanitized_name
-        suffix = 1
-        while True:
-            test_name = f"{base_name}-{suffix}"
-            existing = get_existing_session_ids()
-            if test_name not in existing:
-                sanitized_name = test_name
-                break
-            suffix += 1
-    
-    session_id = sanitized_name
-    
     # Create a new tmux session in detached mode
     returncode, stdout, stderr = run_tmux_cmd([
         'new-session', '-d', '-s', session_id
@@ -293,22 +260,66 @@ def new_command(command: str, force_new: bool = False) -> int:
     current_program = get_current_program(session_id)
     
     # Build XML output
-    print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
+    print(f'''<session id="{session_id}" current-program="{current_program}">
 <screen-capture>
 {screen_capture}
 </screen-capture>
 </session>
 <instructions>
-The command has started. To send keystrokes run `cli-tool send-keystrokes` followed by the id and the keystrokes. For instance:
+The command has started. To send keystrokes run `agent-cli-helper send-keystrokes` followed by the id and the keystrokes. For instance:
 
-    $ cli-tool send-keystrokes {session_id} "^X"
+    $ agent-cli-helper send-keystrokes {session_id} "^X"
 
-Run `cli-tool send-keystrokes --help` to find out the full syntax
+Run `agent-cli-helper send-keystrokes --help` to find out the full syntax
 </instructions>
-<important>When you are done, use finish-command to finish the session. For example: cli-tool finish-command {session_id}</important>
+<important>When you are done, use finish-command to finish the session. For example: agent-cli-helper finish-command {session_id}</important>
 <random-usage-tip>{get_next_tip()}</random-usage-tip>''')
     
     return 0
+
+
+def new_command(command: str, force_new: bool = False) -> int:
+    """
+    Start a new command in a tmux session.
+    
+    Creates a new detached tmux session, sends the command to it,
+    and returns XML output with session info and screen capture.
+    
+    If force_new is True and a session with the same name exists,
+    adds a suffix (-1, -2, etc.) to create a new session.
+    """
+    sanitized_name = sanitize_command_name(command)
+    
+    # Check for existing session
+    matching_session = find_matching_session(sanitized_name, "default")
+    
+    # Handle collision case (only if not force_new)
+    if matching_session and not force_new:
+        print(f'''<session id="{sanitized_name}">
+<error>You already have a session named {matching_session}. Did you mean to use that one? Here are your options:
+
+- If you intended to use it, run `agent-cli-helper get-screen-capture {matching_session}`
+- If you want to interrupt it, run `agent-cli-helper kill-session {matching_session}`
+- If you really do want a fresh session, run `agent-cli-helper force-run-command "{command}"`
+</error>
+</session>''')
+        return 1
+    
+    # If force_new and session exists, add a suffix to create a new session
+    session_id = sanitized_name
+    if matching_session and force_new:
+        base_name = sanitized_name
+        suffix = 1
+        while True:
+            test_name = f"{base_name}-{suffix}"
+            existing = get_existing_session_ids()
+            if test_name not in existing:
+                session_id = test_name
+                break
+            suffix += 1
+    
+    # Use the internal function that does the actual tmux session creation
+    return _run_command(command, session_id)
 
 
 def get_screen_capture(session_id: str) -> int:
@@ -336,7 +347,7 @@ def get_screen_capture(session_id: str) -> int:
     # Get current program running in the session
     current_program = get_current_program(session_id)
     
-    print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
+    print(f'''<session id="{session_id}" current-program="{current_program}">
 <screen-capture>
 {screen_capture}
 </screen-capture>
@@ -427,7 +438,7 @@ def send_keystrokes(session_id: str, keystrokes: str, expected_command: Optional
     # This allows models to use send-keystrokes as a way to get the screen
     if not keystrokes.strip():
         screen_capture = capture_pane(session_id)
-        print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
+        print(f'''<session id="{session_id}" current-program="{current_program}">
 <screen-capture>
 {screen_capture}
 </screen-capture>
@@ -441,11 +452,11 @@ def send_keystrokes(session_id: str, keystrokes: str, expected_command: Optional
         # Get a screen capture for context
         screen_capture = capture_pane(session_id)
         
-        print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
+        print(f'''<session id="{session_id}" current-program="{current_program}">
 <error>
-The running program is "{escape_xml(current_program)}", not "{escape_xml(expected_command)}".
+The running program is "{current_program}", not "{expected_command}".
 
-You need to go from "{escape_xml(current_program)}" to "{escape_xml(expected_command)}".
+You need to go from "{current_program}" to "{expected_command}".
 
 For example, if you're in a shell, you may need to send the command to start {expected_command}.
 If you're in another program, you may need to exit it first (e.g., run `send-keystrokes session-id "exit\n"`, `send-keystrokes session-id "^C"`, or `send-keystrokes session-id ":q"`).
@@ -487,8 +498,8 @@ If you're in another program, you may need to exit it first (e.g., run `send-key
     screen_capture = capture_pane(session_id)
     
     # Build XML output
-    print(f'''<session id="{session_id}" current-program="{escape_xml(current_program)}">
-<keystrokes sent="{escape_xml(keystrokes)}" />
+    print(f'''<session id="{session_id}" current-program="{current_program}">
+<keystrokes sent="{keystrokes}" />
 <screen-capture>
 {screen_capture}
 </screen-capture>''')
@@ -566,72 +577,6 @@ def parse_keystrokes(keystrokes: str) -> List[str]:
     return keys
 
 
-def process_info(session_id: str) -> int:
-    """
-    Get process information for a tmux session.
-    
-    Returns command line, time since started, and PID in XML format.
-    """
-    # Get session info
-    returncode, stdout, stderr = run_tmux_cmd([
-        'list-sessions', '-F', '#{session_name}'
-    ])
-    
-    # Get all sessions
-    valid_sessions = []
-    if returncode == 0 and stdout.strip():
-        valid_sessions = [s.strip() for s in stdout.strip().split('\n') if s.strip()]
-    
-    if session_id not in valid_sessions:
-        print(f'''<process-info session-id="{session_id}">
-<error>Session not found: {session_id}</error>
-</process-info>''')
-        return 1
-    
-    # Get detailed session info including PID
-    returncode, stdout, stderr = run_tmux_cmd([
-        'display-message', '-t', session_id, '-F', '#{session_created} #{session_name} #{pane_pid}'
-    ])
-    
-    if returncode == 0:
-        parts = stdout.strip().split()
-        if len(parts) >= 1:
-            try:
-                created_time = int(parts[0])
-                now = int(time.time())
-                seconds_running = now - created_time
-                
-                # Get PID if available (parts[2])
-                pid = parts[2] if len(parts) >= 3 else "unknown"
-                
-                # Format uptime
-                if seconds_running < 60:
-                    uptime = f"{seconds_running} seconds"
-                elif seconds_running < 3600:
-                    uptime = f"{seconds_running // 60} minutes"
-                else:
-                    uptime = f"{seconds_running // 3600} hours"
-                
-                print(f'''<process-info session-id="{session_id}">
-<command>{escape_xml(session_id)}</command>
-<uptime>{uptime}</uptime>
-<pid>{pid}</pid>
-<started-at>{datetime.fromtimestamp(created_time).isoformat()}</started-at>
-</process-info>''')
-                return 0
-            except (ValueError, IndexError):
-                pass
-    
-    print(f'''<process-info session-id="{session_id}">
-<command>{escape_xml(session_id)}</command>
-<uptime>unknown</uptime>
-</process-info>''')
-    
-    return 0
-
-
-
-
 
 def list_sessions() -> int:
     """
@@ -686,29 +631,16 @@ def list_sessions() -> int:
             else:
                 time_since = f"{seconds_since_activity // 86400}d"
             
-            print(f'  <session id="{session_name}" current-program="{escape_xml(current_program)}" last-activity="{time_since}" />')
+            print(f'  <session id="{session_name}" current-program="{current_program}" last-activity="{time_since}" />')
     print('</sessions>')
     
     return 0
 
-
-def escape_xml(text: str) -> str:
-    """Escape special XML characters."""
-    return (text
-            .replace('&', '&amp;')
-            .replace('<', '&lt;')
-            .replace('>', '&gt;')
-            .replace('"', '&quot;')
-            .replace("'", '&apos;'))
-
-
-# Usage tips - cycling through commands starting at process-info
 USAGE_TIPS = [
-    ("process-info", "diagnose session state (check PID, uptime, if still running)", "cli-tool process-info <session-id>"),
-    ("get-screen-capture", "see the current screen without sending keystrokes", "cli-tool get-screen-capture <session-id>"),
-    ("send-keystrokes", "send keystrokes to control the program", "cli-tool send-keystrokes <session-id> 'keys'"),
-    ("list-sessions", "see all active sessions", "cli-tool list-sessions"),
-    ("kill-session", "terminate a specific session", "cli-tool kill-session <session-id>"),
+    ("get-screen-capture", "see the current screen without sending keystrokes", "agent-cli-helper get-screen-capture <session-id>"),
+    ("send-keystrokes", "send keystrokes to control the program", "agent-cli-helper send-keystrokes <session-id> 'keys'"),
+    ("list-sessions", "see all active sessions", "agent-cli-helper list-sessions"),
+    ("kill-session", "terminate a specific session", "agent-cli-helper kill-session <session-id>"),
 
 ]
 
@@ -716,8 +648,6 @@ USAGE_TIPS = [
 def get_next_tip() -> str:
     """
     Get the next usage tip, cycling through commands.
-    
-    Starts at process-info and cycles through all commands.
     """
     global _last_tip_index
     _last_tip_index = (_last_tip_index + 1) % len(USAGE_TIPS)
@@ -733,7 +663,7 @@ def main():
             super().__init__(prog, indent_increment, max_help_position, width)
     
     parser = argparse.ArgumentParser(
-        description='agent-cli-helper is CLI program for LLMs and agents that MUST be used to interface interactive TUI and CLI programs',
+        description='**agent-cli-helper** is a CLI program for LLMs and agents that MUST be used to interface interactive TUI and CLI programs.',
         formatter_class=WideHelpFormatter,
         epilog=__doc__
     )
@@ -786,9 +716,9 @@ def main():
     # finish-command - distinct command for cleaning up sessions
     finish_parser = subparsers.add_parser(
         'finish-command',
-        help='Finish a session and clean up (Important: MUST be run after finishing a command - there is no garbage collector!)',
+        help='Finish a session and clean up. Important: MUST be run after finishing a command because there is no garbage collector!',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='IMPORTANT: When you are done, use finish-command to finish the session. For example: cli-tool finish-command <session-id>'
+        epilog='IMPORTANT: When you are done, use finish-command to finish the session. For example: agent-cli-helper finish-command <session-id>'
     )
     finish_parser.add_argument(
         'session_id',
@@ -843,19 +773,6 @@ def main():
              'If omitted, just returns screen capture (like get-screen-capture).'
     )
     
-    # process-info
-    proc_parser = subparsers.add_parser(
-        'process-info',
-        help='Get process information for a session'
-    )
-    proc_parser.add_argument(
-        'session_id',
-        help='The session ID to get info for'
-    )
-    
-
-    
-    # list (for --global)
     list_parser = subparsers.add_parser(
         'list-sessions',
         help='List all sessions'
@@ -889,15 +806,11 @@ def main():
         return send_keystrokes(args.session_id, args.keystrokes, expected_command=args.expected_command, raw=False)[0]
     elif args.command == 'send-raw-keystrokes':
         return send_keystrokes(args.session_id, args.keystrokes, expected_command=args.expected_command, raw=True)[0]
-    elif args.command == 'process-info':
-        return process_info(args.session_id)
-
     elif args.command == 'list-sessions':
         return list_sessions()
     else:
         parser.print_help()
         return 1
-
 
 if __name__ == '__main__':
     sys.exit(main())
