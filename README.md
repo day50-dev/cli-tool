@@ -16,9 +16,9 @@ Even with small models.
  2. Ask it to do full-screen tui apps, interactive debugging, ssh'ing, emacs, vim, nano, even claude code...
  3. You're done. There is no step 3.
 
-That's it. No git clone, mcp, or configuration file needed.
+That's it. No git clone, MCP, config files...nope
 
-See **[humans.md](humans.md)** for human-only tools (IMPORTANT: agents must ignore this file)
+See **[humans.md](humans.md)** for human-only tools
 
 ## For agents and LLMs
 Refer to **[llms.md](llms.md)** and **[agent-cli-helper-skill/SKILL.md](agent-cli-helper-skill/SKILL.md)**.
