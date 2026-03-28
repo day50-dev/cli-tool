@@ -16,7 +16,7 @@ Even with small models.
  2. Ask it to do full-screen tui apps, interactive debugging, ssh'ing, emacs, vim, nano, even claude code...
  3. You're done. There is no step 3.
 
-That's it. No git clone, MCP, config files...nope
+That's it. No git clone, MCP, config files... nothing else needed.
 
 See **[humans.md](humans.md)** for human-only tools
 
